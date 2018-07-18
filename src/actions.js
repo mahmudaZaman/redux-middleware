@@ -1,17 +1,12 @@
-export function addFruit(fruit) {
-  return {
-    type: "ADD_FRUIT",
-    payload: {
-      fruit
-    }
-  };
-}
+const asyncFunc = postId =>
+  fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`);
 
-export function changeInput(fruit) {
+export function changeInput(postId) {
   return {
     type: "CHANGE_INPUT",
     payload: {
-      fruit
+      postId,
+      asyncFunc
     }
   };
 }

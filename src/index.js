@@ -4,33 +4,50 @@ import "./index.css";
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
 
 const initialState = {
-  fruits: [],
-  fruit: null
+  postId: null,
+  postDetails: null
 };
+
 const rootReducer = (state = initialState, action) => {
-  console.log(action);
+  // console.log("[REDUCER] got and action...", action);
   // action.payload
   switch (action.type) {
-    case "ADD_FRUIT": {
-      return {
-        ...state,
-        fruits: [...state.fruits, action.payload.fruit],
-        fruit: null
-      };
-    }
     case "CHANGE_INPUT": {
       return {
         ...state,
-        fruit: action.payload.fruit
+        postId: action.payload.postId,
+        postDetails: action.payload.postDetails
       };
     }
   }
   return state;
 };
-const store = createStore(rootReducer);
+// logger(store)(m[0])(action)();
+const logger = store => {
+  return next => {
+    return action => {
+      // console.log("[MIDDLEWARE] before going to reducer dispatching...");
+      // console.log("OLD STATE", action);
+      action.payload
+        .asyncFunc(action.payload.postId)
+        .then(response => response.json())
+        .then(json => {
+          action.payload.postDetails = json;
+          next(action);
+        });
+      // const result = next(action);
+      // console.log(
+      //   "[MIDDLEWARE] after updating state by reducer dispatching..."
+      // );
+      // console.log("NEW STATE", store.getState());
+      // return result;
+    };
+  };
+};
+const store = createStore(rootReducer, applyMiddleware(logger));
 ReactDOM.render(
   <Provider store={store}>
     <App />
