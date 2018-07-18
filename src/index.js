@@ -25,12 +25,22 @@ const rootReducer = (state = initialState, action) => {
   }
   return state;
 };
+const mw = store => {
+  return next => {
+    return action => {
+      if (typeof action === "function") {
+        action(next);
+      } else next(action);
+    };
+  };
+};
+
 // logger(store)(m[0])(action)();
 const logger = store => {
   return next => {
     return action => {
       // console.log("[MIDDLEWARE] before going to reducer dispatching...");
-      // console.log("OLD STATE", action);
+      console.log("OLD STATE", action);
       action.payload
         .asyncFunc(action.payload.postId)
         .then(response => response.json())
